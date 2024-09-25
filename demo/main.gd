@@ -7,7 +7,7 @@ func _ready() -> void:
 	
 	csharp.OriginalLambda = func(): print("Hello Callable")
 	csharp.Lambda = CallableTrampoline.wrap(func(): print("Hello Callable Trampoline")).get_caller()
-	# csharp.TestLambda()
+	csharp.TestLambda()
 
 	var add = func(a, b): return a + b
 	csharp.OriginalBind = add.bind(1);
