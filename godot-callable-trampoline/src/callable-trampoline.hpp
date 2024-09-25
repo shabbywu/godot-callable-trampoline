@@ -2,15 +2,13 @@
 #include <godot_cpp/classes/ref_counted.hpp>
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/variant/callable.hpp>
-#include <set>
 using namespace godot;
 
 namespace gdbind {
-/// @brief godot-csharp does not support CallableCustom.
+/// @brief godot-csharp does not support CallableCustom, but only member method.
+///        CallableTrampoline wrap an Callable as member method to let godot-csharp happy to it.
 class CallableTrampoline : public RefCounted {
     GDCLASS(CallableTrampoline, RefCounted);
-
-    static inline std::set<CallableTrampoline *> instances;
 
   public:
     Callable callable;
@@ -32,14 +30,17 @@ class CallableTrampoline : public RefCounted {
     }
 
   public:
+    /// @brief helper function, wrap given callable to CallableTrampoline*.
     static CallableTrampoline *wrap(godot::Callable callable) {
         return memnew(CallableTrampoline(callable));
     };
 
   protected:
+    /// @brief helper function, return a Callable which godot-csharp can access correctly.
     Callable get_caller() {
         return Callable(this, "trampoline");
     }
+    /// @brief The trampoline transfer all arguments to the real callable.
     Variant trampoline(const godot::Variant **p_arguments, GDExtensionInt p_argcount,
                        GDExtensionCallError &r_call_error) {
         if (!callable.is_valid()) {
