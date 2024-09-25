@@ -17,4 +17,6 @@ func _ready() -> void:
 	# free reference
 	csharp.Lambda = null
 	csharp.Bind = null
+	# csharp hold an reference, only gc can release it.
+	# maybe it's not necessary to call gc manually in many case. here just for test.
 	csharp.Collect()
