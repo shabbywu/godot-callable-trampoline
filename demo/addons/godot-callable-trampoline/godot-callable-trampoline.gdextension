@@ -1,0 +1,15 @@
+[configuration]
+
+entry_symbol = "callable_trampoline_library_init"
+compatibility_minimum = "4.2.1"
+
+[libraries]
+
+macos.debug.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.debug.x86_64.dylib"
+macos.release.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.release.x86_64.dylib"
+macos.debug.arm64 = "bin/macos/libgodot-callable-trampoline.macos.debug.arm64.dylib"
+macos.release.arm64 = "bin/macos/libgodot-callable-trampoline.macos.release.arm64.dylib"
+windows.debug.x86_64 = "bin/win64/godot-callable-trampoline.windows.debug.x86_64.dll"
+windows.release.x86_64 = "bin/win64/godot-callable-trampoline.windows.release.x86_64.dll"
+linux.debug.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.debug.x86_64.so"
+linux.release.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.release.x86_64.so"
