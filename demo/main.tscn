@@ -8,3 +8,27 @@ script = ExtResource("1_2dwix")
 
 [node name="Csharp" type="Node" parent="."]
 script = ExtResource("2_od4os")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Csharp"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Control" type="HBoxContainer" parent="Csharp/VBoxContainer"]
+layout_mode = 2
+
+[node name="Lambda" type="Button" parent="Csharp/VBoxContainer/Control"]
+layout_mode = 2
+text = "Click me call lambda"
+
+[node name="Bind" type="Button" parent="Csharp/VBoxContainer/Control"]
+layout_mode = 2
+text = "Click me call bound callable"
+
+[node name="Text" type="HBoxContainer" parent="Csharp/VBoxContainer"]
+layout_mode = 2
+
+[node name="Lambda" type="Label" parent="Csharp/VBoxContainer/Text"]
+layout_mode = 2
+
+[node name="Bind" type="Label" parent="Csharp/VBoxContainer/Text"]
+layout_mode = 2

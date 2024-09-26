@@ -5,8 +5,8 @@ extends Node2D
 func _ready() -> void:
 	var csharp = get_node("Csharp")
 	
-	csharp.OriginalLambda = func(): print("Hello Callable")
-	csharp.Lambda = CallableTrampoline.wrap(func(): print("Hello Callable Trampoline")).get_caller()
+	csharp.OriginalLambda = func(): return "Hello Callable Trampoline"
+	csharp.Lambda = CallableTrampoline.wrap(func(): return "Hello Callable Trampoline").get_caller()
 	csharp.TestLambda()
 
 	var add = func(a, b): return a + b
@@ -14,9 +14,9 @@ func _ready() -> void:
 	csharp.Bind = CallableTrampoline.wrap(add.bind(1)).get_caller()
 	print("add(1, 2) = ", csharp.TestBind(2))
 
-	# free reference
-	csharp.Lambda = null
-	csharp.Bind = null
+	# test free reference
+	## csharp.Lambda = null
+	## csharp.Bind = null
 	# csharp hold a reference, only gc can release it.
 	# maybe it's not necessary to call gc manually in many case. here just for test.
-	csharp.Collect()
+	## csharp.Collect()
