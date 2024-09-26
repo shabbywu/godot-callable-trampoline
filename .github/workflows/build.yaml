@@ -37,15 +37,15 @@ jobs:
           artifact: linux-x64-release
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
-        - name: 🍎 Build (MacOS, Clang, universal) - Debug
+        - name: 🍎 Build (MacOS, Clang, arm64) - Debug
           os: macos-latest
-          artifact: macos-universal-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          artifact: macos-arm64-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🍎 Build (MacOS, Clang, universal) - Release
+        - name: 🍎 Build (MacOS, Clang, arm64) - Release
           os: macos-latest
-          artifact: macos-universal-release
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          artifact: macos-arm64-release
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
 
     steps:
@@ -103,8 +103,8 @@ jobs:
 
           [libraries]
 
-          macos.debug = "bin/macos/libgodot-callable-trampoline.macos.debug.dylib"
-          macos.release = "bin/macos/libgodot-callable-trampoline.macos.release.dylib"
+          macos.debug.arm64 = "bin/macos/libgodot-callable-trampoline.macos.debug.arm64.dylib"
+          macos.release.arm64 = "bin/macos/libgodot-callable-trampoline.macos.release.arm64.dylib"
           windows.debug.x86_64 = "bin/win64/godot-callable-trampoline.windows.debug.x86_64.dll"
           windows.release.x86_64 = "bin/win64/godot-callable-trampoline.windows.release.x86_64.dll"
           linux.debug.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.debug.x86_64.so"
