@@ -1,0 +1,146 @@
+name: Build
+on:
+  workflow_dispatch:
+
+env:
+  # Only used for the cache key. Increment version to force clean build.
+  GODOT_BASE_BRANCH: main
+
+concurrency:
+  group: ci-${{github.actor}}-${{github.head_ref || github.run_number}}-${{github.ref}}
+  cancel-in-progress: true
+
+jobs:
+  cmake:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+        - name: 🏁 Build (Windows, MSVC, CMake) - Debug
+          os: windows-2022
+          env: {}
+          artifact: windows-x64-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          buildPresetAdditionalArgs: '[`--config Debug`]'
+        - name: 🏁 Build (Windows, MSVC, CMake) - Release
+          os: windows-2022
+          env: {}
+          artifact: windows-x64-release
+          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
+          buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🐧 Build (Linux, GCC, CMake) - Debug
+          preset: linux-x64-debug
+          os: ubuntu-24.04
+          env:
+            CC:   gcc-13
+            CXX:  g++-13
+          artifact: linux-x64-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          buildPresetAdditionalArgs: '[`--config Debug`]'
+        - name: 🐧 Build (Linux, GCC, CMake) - Release
+          preset: linux-x64-release
+          os: ubuntu-24.04
+          env:
+            CC:   gcc-13
+            CXX:  g++-13
+          artifact: linux-x64-release
+          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
+          buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🍎 Build (MacOS, Clang, x86_64) - Debug
+          os: macos-latest
+          env: {}
+          preset: macos-x64-debug
+          artifact: macos-x86_64-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          buildPresetAdditionalArgs: '[`--config Debug`]'
+        - name: 🍎 Build (MacOS, Clang, arm64) - Debug
+          os: macos-latest
+          env: {}
+          preset: macos-x64-debug
+          artifact: macos-arm64-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          buildPresetAdditionalArgs: '[`--config Debug`]'
+        - name: 🍎 Build (MacOS, Clang, x86_64) - Release
+          os: macos-latest
+          env: {}
+          preset: macos-x64-release
+          artifact: macos-x86_64-release
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🍎 Build (MacOS, Clang, arm64) - Release
+          os: macos-latest
+          env: {}
+          preset: macos-x64-release
+          artifact: macos-arm64-release
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          buildPresetAdditionalArgs: '[`--config Release`]'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.PRIVATE_TOKEN }}
+
+      # Install latest CMake and Ninja.
+      - uses: lukka/get-cmake@latest
+
+      - name: Install dependencies
+        if: ${{ matrix.os == 'ubuntu-24.04' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qqq build-essential pkg-config gcc-13 g++-13
+
+      - name: Run CMake consuming CMakePreset.json
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: default
+          configurePresetAdditionalArgs: ${{ matrix.configurePresetAdditionalArgs }}
+          buildPreset: default
+          buildPresetAdditionalArgs: ${{ matrix.buildPresetAdditionalArgs }}
+        env: ${{ matrix.env }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}.${{ github.ref_name }}
+          path: bin
+          retention-days: 1
+
+  archive:
+    name: Archive all prebuilt library
+    runs-on: ubuntu-24.04
+    needs:
+    - cmake
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/addons/godot-callable-trampoline/bin
+          merge-multiple: true
+      - name: generate godot-callable-trampoline.gdextension
+        run: |
+          cat > artifacts/addons/godot-callable-trampoline/godot-callable-trampoline.gdextension <<EOF
+          [configuration]
+
+          entry_symbol = "callable_trampoline_library_init"
+          compatibility_minimum = "4.2.1"
+
+          [libraries]
+
+          macos.debug.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.debug.x86_64.dylib"
+          macos.release.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.release.x86_64.dylib"
+          macos.debug.arm64 = "bin/macos/libgodot-callable-trampoline.macos.debug.arm64.dylib"
+          macos.release.arm64 = "bin/macos/libgodot-callable-trampoline.macos.release.arm64.dylib"
+          windows.debug.x86_64 = "bin/win64/godot-callable-trampoline.windows.debug.x86_64.dll"
+          windows.release.x86_64 = "bin/win64/godot-callable-trampoline.windows.release.x86_64.dll"
+          linux.debug.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.debug.x86_64.so"
+          linux.release.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.release.x86_64.so"
+          EOF
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: godot-callable-trampoline.${{ github.ref_name }}
+          path: artifacts
+          retention-days: 1

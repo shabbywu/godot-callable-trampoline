@@ -10,6 +10,7 @@
 #include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 #include "callable-trampoline.hpp"
+#include "doc_data_registration.hpp"
 
 using namespace godot;
 

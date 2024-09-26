@@ -96,14 +96,6 @@ else()
   set(GENERATE_BINDING_PARAMETERS "False")
 endif()
 
-execute_process(
-  COMMAND
-    "${Python3_EXECUTABLE}"
-    "${CMAKE_CURRENT_LIST_DIR}/doc_classes/make_doc_source.py"
-    "${CMAKE_CURRENT_LIST_DIR}/src/doc_data_registration.hpp"
-    "${CMAKE_CURRENT_LIST_DIR}/doc_classes"
-  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
-
 # Get Sources
 file(GLOB_RECURSE SOURCES src/*.c**)
 file(GLOB_RECURSE HEADERS include/*.h**)
