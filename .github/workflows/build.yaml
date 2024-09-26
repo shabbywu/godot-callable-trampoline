@@ -19,41 +19,31 @@ jobs:
         include:
         - name: 🏁 Build (Windows, MSVC, CMake) - Debug
           os: windows-2022
-          env: {}
           artifact: windows-x64-debug
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
         - name: 🏁 Build (Windows, MSVC, CMake) - Release
           os: windows-2022
-          env: {}
           artifact: windows-x64-release
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
         - name: 🐧 Build (Linux, GCC, CMake) - Debug
           os: ubuntu-24.04
-          env:
-            CC:   gcc-13
-            CXX:  g++-13
           artifact: linux-x64-debug
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
         - name: 🐧 Build (Linux, GCC, CMake) - Release
           os: ubuntu-24.04
-          env:
-            CC:   gcc-13
-            CXX:  g++-13
           artifact: linux-x64-release
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
         - name: 🍎 Build (MacOS, Clang, universal) - Debug
           os: macos-latest
-          env: {}
           artifact: macos-universal-debug
           configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
         - name: 🍎 Build (MacOS, Clang, universal) - Release
           os: macos-latest
-          env: {}
           artifact: macos-universal-release
           configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
@@ -67,11 +57,14 @@ jobs:
       # Install latest CMake and Ninja.
       - uses: lukka/get-cmake@latest
 
-      - name: Install dependencies
-        if: ${{ matrix.os == 'ubuntu-24.04' }}
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qqq build-essential pkg-config gcc-13 g++-13
+      # Setup vcpkg: ensures vcpkg is downloaded and built.
+      # Since vcpkg.json is being used later on to install the packages
+      # when `run-cmake` runs, no packages are installed at this time
+      # (and vcpkg does not run).
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11 # Always specify the specific _version_ of the
+                                  # action you need, `v11` in this case to stay up
+                                  # to date with fixes on the v11 branch.
 
       - name: Run CMake consuming CMakePreset.json
         uses: lukka/run-cmake@v10
@@ -80,7 +73,6 @@ jobs:
           configurePresetAdditionalArgs: ${{ matrix.configurePresetAdditionalArgs }}
           buildPreset: default
           buildPresetAdditionalArgs: ${{ matrix.buildPresetAdditionalArgs }}
-        env: ${{ matrix.env }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
