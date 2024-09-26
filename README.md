@@ -4,7 +4,7 @@ GDExtension let godotsharp can call `CallableCustom` such as `GDScriptLambdaCall
 
 ## Installation
 1. donwload prebuilt GDExtension from [github release page](https://github.com/shabbywu/godot-callable-trampoline/releases/tag/v1.0.0)
-2. unzip the archive downloaded from step 1 to your godot project rootdir.
+2. unzip the archive downloaded from `step 1` to your godot project rootdir.
 
 ## Usage
 ```gdscript
