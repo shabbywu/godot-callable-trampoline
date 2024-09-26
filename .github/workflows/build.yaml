@@ -30,7 +30,6 @@ jobs:
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
         - name: 🐧 Build (Linux, GCC, CMake) - Debug
-          preset: linux-x64-debug
           os: ubuntu-24.04
           env:
             CC:   gcc-13
@@ -39,7 +38,6 @@ jobs:
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
         - name: 🐧 Build (Linux, GCC, CMake) - Release
-          preset: linux-x64-release
           os: ubuntu-24.04
           env:
             CC:   gcc-13
@@ -47,33 +45,17 @@ jobs:
           artifact: linux-x64-release
           configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
-        - name: 🍎 Build (MacOS, Clang, x86_64) - Debug
+        - name: 🍎 Build (MacOS, Clang, universal) - Debug
           os: macos-latest
           env: {}
-          preset: macos-x64-debug
-          artifact: macos-x86_64-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          artifact: macos-universal-debug
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
           buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🍎 Build (MacOS, Clang, arm64) - Debug
+        - name: 🍎 Build (MacOS, Clang, universal) - Release
           os: macos-latest
           env: {}
-          preset: macos-x64-debug
-          artifact: macos-arm64-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
-          buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🍎 Build (MacOS, Clang, x86_64) - Release
-          os: macos-latest
-          env: {}
-          preset: macos-x64-release
-          artifact: macos-x86_64-release
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
-          buildPresetAdditionalArgs: '[`--config Release`]'
-        - name: 🍎 Build (MacOS, Clang, arm64) - Release
-          os: macos-latest
-          env: {}
-          preset: macos-x64-release
-          artifact: macos-arm64-release
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          artifact: macos-universal-release
+          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64;x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
           buildPresetAdditionalArgs: '[`--config Release`]'
 
     steps:
@@ -128,10 +110,8 @@ jobs:
 
           [libraries]
 
-          macos.debug.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.debug.x86_64.dylib"
-          macos.release.x86_64 = "bin/macos/libgodot-callable-trampoline.macos.release.x86_64.dylib"
-          macos.debug.arm64 = "bin/macos/libgodot-callable-trampoline.macos.debug.arm64.dylib"
-          macos.release.arm64 = "bin/macos/libgodot-callable-trampoline.macos.release.arm64.dylib"
+          macos.debug = "bin/macos/libgodot-callable-trampoline.macos.debug.dylib"
+          macos.release = "bin/macos/libgodot-callable-trampoline.macos.release.dylib"
           windows.debug.x86_64 = "bin/win64/godot-callable-trampoline.windows.debug.x86_64.dll"
           windows.release.x86_64 = "bin/win64/godot-callable-trampoline.windows.release.x86_64.dll"
           linux.debug.x86_64 = "bin/linux/libgodot-callable-trampoline.linux.debug.x86_64.so"
