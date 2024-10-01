@@ -13,5 +13,8 @@
         "name": "vcpkg-cmake-config",
         "host": true
       }
-    ]
+    ],
+    "features": {
+      "static-cpp": { "description": "Build with static_cpp(/MTd, MT)"}
+    }
   }

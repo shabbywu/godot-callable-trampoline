@@ -1,5 +1,8 @@
 {
   "dependencies": [
-    "godot-cpp"
+    {
+      "name": "godot-cpp",
+      "features": []
+    }
   ]
 }
