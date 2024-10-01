@@ -37,9 +37,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /DTYPED_METHOD_BIND")
 
   if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS}") # /Od /RTC1 /Zi
+    set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /MDd") # /Od /RTC1 /Zi
   else()
-    set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /O2") # /Oy /GL /Gy
+    set(GODOT_COMPILE_FLAGS "${GODOT_COMPILE_FLAGS} /MD /O2") # /Oy /GL /Gy
     string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS
                          "${CMAKE_CXX_FLAGS}")
     string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
@@ -107,7 +107,7 @@ target_include_directories(
   ${PROJECT_NAME} SYSTEM
   PRIVATE ${CPP_BINDINGS_PATH}/include ${CPP_BINDINGS_PATH}/gen/include
           ${GODOT_GDEXTENSION_DIR} ${CMAKE_CURRENT_LIST_DIR}/src)
-target_link_libraries(${PROJECT_NAME} unofficial::godot::cpp)
+target_link_libraries(${PROJECT_NAME} godot-cpp::godot-cpp)
 
 # Create the correct name (godot.os.build_type.system_bits) Synchronized with
 # godot-cpp's CMakeLists.txt
