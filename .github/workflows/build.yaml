@@ -17,37 +17,41 @@ jobs:
     strategy:
       matrix:
         include:
-        - name: 🏁 Build (Windows, MSVC, CMake) - Debug
+        - name: 🏁 Build (Windows, MSVC, CMake)
           os: windows-2022
-          artifact: windows-x64-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
-          buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🏁 Build (Windows, MSVC, CMake) - Release
-          os: windows-2022
-          artifact: windows-x64-release
-          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
-          buildPresetAdditionalArgs: '[`--config Release`]'
-        - name: 🐧 Build (Linux, GCC, CMake) - Debug
+          artifact: windows-x64
+          triplet: x64-windows
+          Debug_configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          Debug_buildPresetAdditionalArgs: '[`--config Debug`]'
+          Release_configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
+          Release_buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🐧 Build (Linux, GCC, CMake)
           os: ubuntu-24.04
-          artifact: linux-x64-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
-          buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🐧 Build (Linux, GCC, CMake) - Release
-          os: ubuntu-24.04
-          artifact: linux-x64-release
-          configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
-          buildPresetAdditionalArgs: '[`--config Release`]'
-        - name: 🍎 Build (MacOS, Clang, arm64) - Debug
+          artifact: linux-x64
+          triplet: x64-linux
+          Debug_configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          Debug_buildPresetAdditionalArgs: '[`--config Debug`]'
+          Release_configurePresetAdditionalArgs: "['-DCMAKE_BUILD_TYPE=\"Release\"']"
+          Release_buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🍎 Build (MacOS, Clang, arm64)
           os: macos-latest
-          artifact: macos-arm64-debug
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
-          buildPresetAdditionalArgs: '[`--config Debug`]'
-        - name: 🍎 Build (MacOS, Clang, arm64) - Release
+          artifact: macos-arm64
+          triplet: arm64-osx
+          Debug_configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          Debug_buildPresetAdditionalArgs: '[`--config Debug`]'
+          Release_configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          Release_buildPresetAdditionalArgs: '[`--config Release`]'
+        - name: 🍎 Build (MacOS, Clang, x86_64)
           os: macos-latest
-          artifact: macos-arm64-release
-          configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"arm64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
-          buildPresetAdditionalArgs: '[`--config Release`]'
+          artifact: macos-x86_64
+          triplet: x64-osx
+          Debug_configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Debug\"']"
+          Debug_buildPresetAdditionalArgs: '[`--config Debug`]'
+          Release_configurePresetAdditionalArgs: "['-DCMAKE_OSX_ARCHITECTURES=\"x86_64\"', '-DCMAKE_BUILD_TYPE=\"Release\"']"
+          Release_buildPresetAdditionalArgs: '[`--config Release`]'
 
+    env:
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,13 +70,21 @@ jobs:
                                   # action you need, `v11` in this case to stay up
                                   # to date with fixes on the v11 branch.
 
-      - name: Run CMake consuming CMakePreset.json
+      - name: Run CMake consuming CMakePreset.json (Debug)
         uses: lukka/run-cmake@v10
         with:
           configurePreset: default
-          configurePresetAdditionalArgs: ${{ matrix.configurePresetAdditionalArgs }}
+          configurePresetAdditionalArgs: ${{ matrix.Debug_configurePresetAdditionalArgs }}
           buildPreset: default
-          buildPresetAdditionalArgs: ${{ matrix.buildPresetAdditionalArgs }}
+          buildPresetAdditionalArgs: ${{ matrix.Debug_buildPresetAdditionalArgs }}
+
+      - name: Run CMake consuming CMakePreset.json (Release)
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: default
+          configurePresetAdditionalArgs: ${{ matrix.Release_configurePresetAdditionalArgs }}
+          buildPreset: default
+          buildPresetAdditionalArgs: ${{ matrix.Release_buildPresetAdditionalArgs }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
